@@ -17,7 +17,7 @@ jobs:
             image: debian:bookworm-slim
             setup-hook: |
               echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/bookworm-backports.list'
-              apt update
+              apt-get update
           - name: Debian 13
             codename: trixie
             image: debian:trixie-slim
@@ -37,7 +37,7 @@ jobs:
           buildpackage-opts: --build=binary --no-sign
           host-arch: ${{ matrix.arch }}
           extra-repos: |
-            deb https://apt.postgresql.org/pub/repos/apt ${{ matrix.distro.codename }}-pgdg main
+            deb http://apt.postgresql.org/pub/repos/apt ${{ matrix.distro.codename }}-pgdg main
           extra-repo-keys: |
             -----BEGIN PGP PUBLIC KEY BLOCK-----
 
@@ -116,7 +116,7 @@ jobs:
             Gtz3cydIohvNO9d90+29h0eGEDYti7j7maHkBKUAwlcPvMg5m3Y=
             =DA1T
             -----END PGP PUBLIC KEY BLOCK-----
-          extra-build-deps: ca-certificates devscripts build-essential
+          extra-build-deps: devscripts build-essential
       - name: Upload package as artifact
         uses: actions/upload-artifact@v7
         with:
