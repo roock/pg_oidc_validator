@@ -16,7 +16,7 @@ jobs:
             codename: bookworm
             image: debian:bookworm-slim
             setup-hook: |
-              echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/bookworm-backports.list'
+              echo "deb http://deb.debian.org/debian bookworm-backports main" > /etc/apt/sources.list.d/bookworm-backports.list
               apt-get update
           - name: Debian 13
             codename: trixie
@@ -32,7 +32,7 @@ jobs:
           DEB_BUILD_OPTIONS: noautodbgsym
         with:
           docker-image: ${{ matrix.distro.image }}
-          setup-hook: ${{ matrix.distro.settup-hook }}
+          setup-hook: ${{ matrix.distro.setup-hook }}
           before-build-hook: dch -D ${{ matrix.distro.codename }} --local ~${{ matrix.distro.codename }}+git${{ github.sha }} ""
           buildpackage-opts: --build=binary --no-sign
           host-arch: ${{ matrix.arch }}
