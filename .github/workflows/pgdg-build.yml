@@ -2,7 +2,7 @@ name: PGDG
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main debian-package]
   pull_request:
 
 jobs:
