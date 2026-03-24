@@ -9,7 +9,7 @@ Vcs-Browser: https://github.com/percona/pg_oidc_validator
 Vcs-Git: https://github.com/percona/pg_oidc_validator.git
 
 Package: postgresql-PGVERSION-oidc-validator
-Architecture: amd64
+Architecture: any
 Depends: postgresql-PGVERSION, ${shlibs:Depends}, ${misc:Depends}, 
 Description: OAuth validator library for PostgreSQL 18+
  NOTE: This library is still experimental and not intended for production use.
