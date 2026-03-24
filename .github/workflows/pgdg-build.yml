@@ -12,9 +12,9 @@ jobs:
     strategy:
       matrix:
         distro:
-          #- name: Debian 12
-          #  codename: bookworm
-          #  image: debian:bookworm-slim
+          - name: Debian 12
+            codename: bookworm
+            image: debian:bookworm-slim
           - name: Debian 13
             codename: trixie
             image: debian:trixie-slim
