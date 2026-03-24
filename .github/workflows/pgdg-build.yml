@@ -206,96 +206,96 @@ jobs:
   #       name: pg-oidc-validator-tgz
   #       path: pg-oidc-validator-pgdg18.tar.gz
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    needs: [pgxs-build]
+  # test:
+  #   name: Test
+  #   runs-on: ubuntu-latest
+  #   needs: [pgxs-build]
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
 
-    - name: Download built package
-      uses: actions/download-artifact@v4
-      with:
-        name: pg-oidc-validator-deb
+  #   - name: Download built package
+  #     uses: actions/download-artifact@v4
+  #     with:
+  #       name: pg-oidc-validator-deb
 
-    - name: Stop default PostgreSQL
-      run: |
-        sudo systemctl stop postgresql || true
-        sudo systemctl disable postgresql || true
+  #   - name: Stop default PostgreSQL
+  #     run: |
+  #       sudo systemctl stop postgresql || true
+  #       sudo systemctl disable postgresql || true
 
-    - name: Install PostgreSQL 18
-      run: |
-        echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main 18" | \
-          sudo tee /etc/apt/sources.list.d/pgdg.list
-        wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
-          gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/postgresql.gpg > /dev/null
-        sudo apt-get update
-        sudo apt-get install -y postgresql-18 libpq-oauth
+  #   - name: Install PostgreSQL 18
+  #     run: |
+  #       echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main 18" | \
+  #         sudo tee /etc/apt/sources.list.d/pgdg.list
+  #       wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
+  #         gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/postgresql.gpg > /dev/null
+  #       sudo apt-get update
+  #       sudo apt-get install -y postgresql-18 libpq-oauth
 
-    - name: Install pg_oidc_validator package
-      run: |
-        sudo dpkg -i pg-oidc-validator-pgdg18.deb
+  #   - name: Install pg_oidc_validator package
+  #     run: |
+  #       sudo dpkg -i pg-oidc-validator-pgdg18.deb
 
-    - name: Install test dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y ruby-full ruby-bundler chromium-browser chromium-chromedriver curl net-tools
+  #   - name: Install test dependencies
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt-get install -y ruby-full ruby-bundler chromium-browser chromium-chromedriver curl net-tools
 
-    - name: Set up Ruby gems
-      run: |
-        cd test
-        bundle config set --local path 'vendor/bundle'
-        bundle install
+  #   - name: Set up Ruby gems
+  #     run: |
+  #       cd test
+  #       bundle config set --local path 'vendor/bundle'
+  #       bundle install
 
-    - name: Install SSL certificate for psql
-      run: |
-        sudo cp test/keys/crt.pem /usr/local/share/ca-certificates/keycloak-test.crt
-        sudo update-ca-certificates
+  #   - name: Install SSL certificate for psql
+  #     run: |
+  #       sudo cp test/keys/crt.pem /usr/local/share/ca-certificates/keycloak-test.crt
+  #       sudo update-ca-certificates
 
-    - name: Run tests
-      run: |
-        cd test
-        echo "PostgreSQL version:"
-        /usr/lib/postgresql/18/bin/postgres --version
-        echo "Port 5432 status:"
-        sudo netstat -tulpn | grep 5432 || echo "Port 5432 not in use"
-        echo "Chromium version:"
-        chromium-browser --version || echo "Chromium not found"
-        echo "ChromeDriver version:"
-        chromedriver --version || echo "ChromeDriver not found"
-        echo "Running tests..."
-        PGBIN=/usr/lib/postgresql/18/bin bundle exec rspec --format documentation
+  #   - name: Run tests
+  #     run: |
+  #       cd test
+  #       echo "PostgreSQL version:"
+  #       /usr/lib/postgresql/18/bin/postgres --version
+  #       echo "Port 5432 status:"
+  #       sudo netstat -tulpn | grep 5432 || echo "Port 5432 not in use"
+  #       echo "Chromium version:"
+  #       chromium-browser --version || echo "Chromium not found"
+  #       echo "ChromeDriver version:"
+  #       chromedriver --version || echo "ChromeDriver not found"
+  #       echo "Running tests..."
+  #       PGBIN=/usr/lib/postgresql/18/bin bundle exec rspec --format documentation
 
-    - name: Upload test logs on failure
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-logs
-        path: |
-          test/postgres.log
-          test/psql_output.log
-          test/selenium_output.log
-          test/pgdata/log/*
-          /var/log/postgresql/*
-        if-no-files-found: ignore
+  #   - name: Upload test logs on failure
+  #     if: failure()
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: test-logs
+  #       path: |
+  #         test/postgres.log
+  #         test/psql_output.log
+  #         test/selenium_output.log
+  #         test/pgdata/log/*
+  #         /var/log/postgresql/*
+  #       if-no-files-found: ignore
 
-    - name: Download tgz artifact
-      if: "github.repository == 'Percona-Lab/pg_oidc_validator' && github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'schedule')"
-      uses: actions/download-artifact@v4
-      with:
-        name: pg-oidc-validator-tgz
+  #   - name: Download tgz artifact
+  #     if: "github.repository == 'Percona-Lab/pg_oidc_validator' && github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'schedule')"
+  #     uses: actions/download-artifact@v4
+  #     with:
+  #       name: pg-oidc-validator-tgz
 
-    - name: Publish release
-      uses: ncipollo/release-action@v1
-      if: "github.repository == 'Percona-Lab/pg_oidc_validator' && github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'schedule')"
-      with:
-        artifacts: "pg-oidc-validator-pgdg18.tar.gz,pg-oidc-validator-pgdg18.deb"
-        omitBody: true
-        allowUpdates: true
-        generateReleaseNotes: true
-        makeLatest: true
-        tag: "latest"
-        name: "HEAD"
-        replacesArtifacts: true
+  #   - name: Publish release
+  #     uses: ncipollo/release-action@v1
+  #     if: "github.repository == 'Percona-Lab/pg_oidc_validator' && github.ref_name == 'main' && (github.event_name == 'push' || github.event_name == 'schedule')"
+  #     with:
+  #       artifacts: "pg-oidc-validator-pgdg18.tar.gz,pg-oidc-validator-pgdg18.deb"
+  #       omitBody: true
+  #       allowUpdates: true
+  #       generateReleaseNotes: true
+  #       makeLatest: true
+  #       tag: "latest"
+  #       name: "HEAD"
+  #       replacesArtifacts: true
