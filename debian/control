@@ -1,0 +1,16 @@
+Source: postgresql-oidc-validator
+Section: database
+Priority: optional
+Maintainer: Percona
+Build-Depends: debhelper-compat (= 13), postgresql-server-dev-all (>= 18), flex, bison
+Standards-Version: 4.6.2
+Homepage: https://github.com/percona/pg_oidc_validator
+Vcs-Browser: https://github.com/percona/pg_oidc_validator
+Vcs-Git: https://github.com/percona/pg_oidc_validator.git
+
+Package: postgresql-18-oidc-validator
+Architecture: amd64
+Depends: postgresql-18, ${shlibs:Depends}, ${misc:Depends}, 
+Description: OAuth validator library for PostgreSQL 18+
+ NOTE: This library is still experimental and not intended for production use.
+ This library should support most providers that implement OIDC and provide a valid JWT as an access token.
